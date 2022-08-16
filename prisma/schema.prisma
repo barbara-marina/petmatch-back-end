@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Adopter {
+  id Int @id @default(autoincrement())
+  username String
+  email String @unique
+  password String
+  description String @default("")
+  urlImage String @default("https://i.ibb.co/JdX0kyB/logo-Pet-Match.png")
+  createdAt DateTime @default(now())
+
+  adoption Adoption[]
+  message Message[]
+
+  @@map("adopters")
+}
+
+model Ong {
+  id Int @id @default(autoincrement())
+  username String
+  email String @unique
+  password String
+  description String @default("")
+  urlImage String @default("https://i.ibb.co/JdX0kyB/logo-Pet-Match.png")
+  createdAt DateTime @default(now())
+
+  pet Pet[]
+  message Message[]
+
+  @@map("ongs")
+}
+
+
+model Pet {
+  id Int @id @default(autoincrement())
+  ongId Int
+  ong Ong @relation(fields: [ongId], references: [id])
+  name String
+  species String
+  breed String
+  size String
+  weigth String
+  age Int
+  story String @default("")
+  isAdopted Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  adoption Adoption[]
+  petImage PetImage[]
+
+  @@map("pets")
+}
+
+model PetImage {
+  id Int @id @default(autoincrement())
+  petId Int
+  pet Pet @relation(fields: [petId], references: [id])
+  url String
+
+  createdAt DateTime @default(now())
+
+  @@map("petImages")
+}
+
+model Adoption {
+  id Int @id @default(autoincrement())
+  petId Int @unique
+  pet Pet @relation(fields: [petId], references: [id])
+  adopterId Int
+  adopter Adopter @relation(fields: [adopterId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("adoptions")
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+  ongId Int
+  ong Ong @relation(fields: [ongId], references: [id])
+  adopterId Int
+  adopter Adopter @relation(fields: [adopterId], references: [id])
+  description String
+  createdAt DateTime @default(now())
+
+  @@map("messages")
+}
